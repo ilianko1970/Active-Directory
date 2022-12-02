@@ -9,6 +9,8 @@
     pst
     command for mail deletion
 .NOTES
+    Search-mailbox return only 10000 results thus the command should be executed until nothing is found.
+    any masseges with wrong data or before 2000 will be purged. 
 #>
 
 #user account name
