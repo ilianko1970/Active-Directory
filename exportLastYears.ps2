@@ -1,0 +1,45 @@
+<#
+.SYNOPSIS
+    Manage size and archive of user mailbox in Exchange on-premise 
+.DESCRIPTION
+    Export Old mail to pst file, X days before now.
+    Ganerate instruction for mail deleteion
+.EXAMPLE
+.OUTPUTS
+    pst
+    command for mail deletion
+.NOTES
+#>
+
+#user account name
+$name = "john.smith"
+
+#days back  
+$days = 730
+
+$exportLocation = '\\my_shared_folder\exports\'
+$exchangeServer = 'http://exchange.example.org/PowerShell'
+
+if( !(Get-Command Get-MailboxExportRequest) ) # Session to exchange
+{
+   $session = New-PSSession -ConfigurationName microsoft.exchange -ConnectionUri $exchangeServer
+   Import-PSSession $session
+}
+
+$endDate   = (get-date).AddDays(-$days).ToString("MM/dd/yyyy");
+$end = (get-date).AddDays(-$days).ToString("MMddyyyy");
+
+$startDate="01/01/2000"
+$between="Received:${startDate}..${endDate}"
+
+$jobName = "${name}_$end"
+$fileName = "$jobName.pst"
+
+$filter = "(Received -lt '$endDate')"
+New-MailboxExportRequest -Mailbox $name -Name $jobName -BatchName ilianco -FilePath $exportLocation$fileName -ContentFilter $filter -ExcludeFolders ”#DeletedItems#”,”#JunkEmail#","#Conflicts#","#SyncIssues#","Deletions" -ExcludeDumpster -BadItemLimit 100
+
+# Execute after export is ready
+echo "Search-Mailbox -Identity $name -SearchQuery $between -DeleteContent"
+#Search-Mailbox -Identity $name -SearchQuery $between -DeleteContent
+echo "Search-Mailbox -Identity $name -SearchQuery $between -EstimateResultOnly"
+#Search-Mailbox -Identity $name -SearchQuery $between -EstimateResultOnly
