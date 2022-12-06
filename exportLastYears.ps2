@@ -3,7 +3,7 @@
     Manage size and archive of user mailbox in Exchange on-premise 
 .DESCRIPTION
     Export Old mail to pst file, X days before now.
-    Ganerate instruction for mail deleteion
+    Ganerate instruction for mail deletion
 .EXAMPLE
 .OUTPUTS
     pst
